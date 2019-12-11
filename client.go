@@ -80,6 +80,7 @@ func (a *AMQPClient) SetupQueues(queueName string, queueIsDurable, autoDelete bo
 // AMQPClient_StartReceiver Starts a rabbit MQ receiver with the passed configuration, returns a channel
 // that will receive the messages, along with the connection and channel instance
 func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool, routingKeys []string, exchanges interface{}) (<-chan amqp.Delivery, error) {
+	var tag string
 	switch exchange.(type){
 	case []string:
 		for exchanges := range exchanges.([]string) {
@@ -90,6 +91,7 @@ func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool,
 				return make(chan amqp.Delivery), fmt.Errorf("failed to setup queue err: %s", err)
 			}
 		}
+		tag = exchanges.([]string)[0]
 	case string:
 		err := a.SetupQueues(
 			queueName, isDurable, autoDelete, routingKeys, exchanges.(string),
@@ -97,12 +99,14 @@ func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool,
 		if err != nil {
 			return make(chan amqp.Delivery), fmt.Errorf("failed to setup queue err: %s", err)
 		}
+		tag = exchanges.(string)
+
 	default:
-		log.Fatal("Wrong type of exchanges variable received")
+		return make(chan amqp.Delivery), fmt.Errorf("failed to declare exchange due to wrong type in var %v", exchanges)
 	}
 	messages, err := a.Channel.Consume(
 		queueName, // queue
-		exchange,  // consumer
+		tag,  // consumer
 		true,      // auto-ack
 		false,     // exclusive
 		false,     // no-local
