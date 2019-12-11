@@ -81,7 +81,7 @@ func (a *AMQPClient) SetupQueues(queueName string, queueIsDurable, autoDelete bo
 // that will receive the messages, along with the connection and channel instance
 func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool, routingKeys []string, exchanges interface{}) (<-chan amqp.Delivery, error) {
 	var tag string
-	switch exchange.(type){
+	switch exchanges.(type){
 	case []string:
 		for exchange := range exchanges.([]string) {
 			err := a.SetupQueues(
