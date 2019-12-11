@@ -83,7 +83,7 @@ func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool,
 	var tag string
 	switch exchanges.(type){
 	case []string:
-		for exchange := range exchanges.([]string) {
+		for _, exchange := range exchanges.([]string) {
 			err := a.SetupQueues(
 				queueName, isDurable, autoDelete, routingKeys, exchange,
 			)
