@@ -106,7 +106,7 @@ func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool,
 	}
 	messages, err := a.Channel.Consume(
 		queueName, // queue
-		tag,  // consumer
+		"",  // consumer
 		true,      // auto-ack
 		false,     // exclusive
 		false,     // no-local
