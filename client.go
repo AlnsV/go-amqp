@@ -79,7 +79,7 @@ func (a *AMQPClient) SetupQueues(queueName string, queueIsDurable, autoDelete bo
 
 // AMQPClient_StartReceiver Starts a rabbit MQ receiver with the passed configuration, returns a channel
 // that will receive the messages, along with the connection and channel instance
-func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool, routingKeys []string, exchanges interface{}) (<-chan amqp.Delivery, error) {
+func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool, routingKeys []string, exchanges interface{}, consumerTag string) (<-chan amqp.Delivery, error) {
 	switch exchanges.(type){
 	case []string:
 		for _, exchange := range exchanges.([]string) {
@@ -103,7 +103,7 @@ func (a *AMQPClient) StartReceiver(queueName string, isDurable, autoDelete bool,
 	}
 	messages, err := a.Channel.Consume(
 		queueName, // queue
-		"",  // consumer
+		consumerTag,  // consumer
 		true,      // auto-ack
 		false,     // exclusive
 		false,     // no-local
